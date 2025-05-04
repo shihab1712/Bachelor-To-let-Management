@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Signup</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('success') === '1') {
+        const msg = document.getElementById("successMsg");
+        msg.style.display = "block";
+      }
+    };
+  </script>
+</head>
+<body>
+  <form action="signup.php" method="POST">
+    <h2>Sign Up</h2>
+    <p id="successMsg" style="display:none; color: #9effa2; text-align:center; margin-bottom:10px;">
+       Signup Successful!
+    </p>
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="text" name="nid" placeholder="NID" required>
+    <input type="text" name="phone_number" placeholder="Phone Number" required>
+    <select name="user_type" required>
+      <option value="">Select User Type</option>
+      <option value="Bachelor">Bachelor</option>
+      <option value="Owner">Owner</option>
+      <option value="Admin">Admin</option>
+    </select>
+    <input type="text" name="preferred_location" placeholder="Preferred Location" required>
+    <button type="submit">Sign Up</button>
+    <p>Already have an account? <a href="index.html">Login</a></p>
+  </form>
+</body>
+</html>
