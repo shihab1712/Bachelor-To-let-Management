@@ -263,7 +263,7 @@ $meal_rate = $total_meal > 0 ? $total_cost / $total_meal : 0;
         <table>
             <thead>
                 <tr>
-                    <th>Select</th>
+                    <th>Cleared</th>
                     <th>Name</th>
                     <th>Total Meals</th>
                     <th>Total Shopping (৳)</th>
