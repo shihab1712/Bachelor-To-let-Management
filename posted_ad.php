@@ -31,6 +31,19 @@ $result = $query->get_result();
 </head>
 <body>
 
+<div style="text-align: right; margin-bottom: 20px;">
+    <a href="home.php" style="
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+    ">
+        ← Back to Home
+    </a>
+</div>
+
 <h2>Your Posted Vacancies</h2>
 
 <table>
