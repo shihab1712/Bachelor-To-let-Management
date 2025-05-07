@@ -15,6 +15,7 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
 if ($user && $user['password'] === $password) {
+    $_SESSION['user_type'] = $user['user_type'];
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['username'] = $username;
     header("Location: home.php");
