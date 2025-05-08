@@ -168,7 +168,7 @@ $properties = $result->fetch_all(MYSQLI_ASSOC);
                             </form>
                         </td>
                         <td>
-                            <button class="action-btn" onclick="window.location.href='property_reviews.php'">Property Reviews</button>
+                            <a href="property_reviews.php?property_id=<?= $property['id'] ?>" class="btn-review">Property Review</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

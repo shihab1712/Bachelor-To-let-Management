@@ -2,35 +2,41 @@
 session_start();
 require 'db.php';
 
-
-if (!isset($_SESSION['username'])) {
+if (!isset($_SESSION['username']) || $_SESSION['user_type'] !== 'Bachelor') {
     header("Location: index.html");
     exit();
 }
 
-
-// Get bachelor ID
-$username = $_SESSION['username'];
-$user_stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
-$user_stmt->bind_param("s", $username);
-$user_stmt->execute();
-$user_result = $user_stmt->get_result();
-$user = $user_result->fetch_assoc();
-$bachelor_id = $user['id'] ?? 0;
-
-
-// Fetch all reviews and join with property location
-$sql = "SELECT pr.*, p.location
-        FROM property_reviews pr
-        JOIN properties p ON pr.property_id = p.id";
-
-
-$result = $conn->query($sql);
-if (!$result) {
-    die("Error retrieving reviews: " . $conn->error);
+if (!isset($_GET['property_id'])) {
+    die("Property ID is missing.");
 }
-?>
 
+$property_id = $_GET['property_id'];
+
+// Fetch property info
+$prop_stmt = $conn->prepare("SELECT * FROM properties WHERE id = ?");
+$prop_stmt->bind_param("i", $property_id);
+$prop_stmt->execute();
+$prop_result = $prop_stmt->get_result();
+$property = $prop_result->fetch_assoc();
+
+if (!$property) {
+    die("Property not found.");
+}
+
+// Fetch reviews
+$review_stmt = $conn->prepare("
+    SELECT r.outer_env, r.landlord_mgmt, r.room_condition, r.amenities, r.bachelor_friendly,
+           r.location_access, r.value_money, r.review_text, r.created_at, u.username
+    FROM property_reviews r
+    JOIN users u ON r.bachelor_id = u.id
+    WHERE r.property_id = ?
+    ORDER BY r.created_at DESC
+");
+$review_stmt->bind_param("i", $property_id);
+$review_stmt->execute();
+$reviews = $review_stmt->get_result();
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -40,98 +46,95 @@ if (!$result) {
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #fce4ec, #f8bbd0);
-            padding: 20px;
+            background: linear-gradient(to right, #f1f8e9, #c8e6c9);
+            padding: 30px;
         }
+
         .container {
-            max-width: 1000px;
+            max-width: 950px;
             margin: auto;
             background: white;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
+
         h2 {
             text-align: center;
-            color: #880e4f;
+            color: #2e7d32;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
+
+        .property-info {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 12px;
-            text-align: center;
-        }
-        th {
-            background-color: #f8bbd0;
-            color: #880e4f;
-        }
-        tr:nth-child(even) {
-            background-color: #fce4ec;
-        }
-        .back-btn {
-            display: block;
+
+        .review {
+            border: 1px solid #a5d6a7;
+            padding: 20px;
             margin-bottom: 15px;
-            text-align: right;
+            border-radius: 10px;
+            background: #f9fbe7;
         }
-        .back-btn a {
+
+        .review strong {
+            color: #2e7d32;
+        }
+
+        .review p {
+            margin: 6px 0;
+        }
+
+        .no-review {
+            text-align: center;
+            color: #555;
+            font-style: italic;
+        }
+
+        .back-link {
+            margin-bottom: 20px;
+        }
+
+        .back-link a {
+            color: #1b5e20;
             text-decoration: none;
-            background-color: #880e4f;
-            color: white;
-            padding: 8px 14px;
-            border-radius: 6px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-
 <div class="container">
-    <div class="back-btn">
-        <a href="home.php">← Back to Home</a>
+    <div class="back-link"><a href="properties_ad.php">← Back to Browse Properties</a></div>
+    <h2>Reviews for Property in <?= htmlspecialchars($property['location']) ?></h2>
+
+    <div class="property-info">
+        <p><strong>Rent:</strong> <?= htmlspecialchars($property['rent']) ?> BDT</p>
+        <p><strong>Rooms:</strong> <?= htmlspecialchars($property['rooms']) ?></p>
+        <p><strong>Features:</strong> <?= htmlspecialchars($property['features']) ?></p>
     </div>
 
-
-    <h2>All Property Reviews</h2>
-
-
-    <table>
-        <thead>
-            <tr>
-                <th>Location</th>
-                <th>Outer Environment</th>
-                <th>Landlord</th>
-                <th>Room Condition</th>
-                <th>Amenities</th>
-                <th>Bachelor-Friendly</th>
-                <th>Accessibility</th>
-                <th>Value</th>
-                <th>Comment</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <td><?= htmlspecialchars($row['location']) ?></td>
-                    <td><?= str_repeat("★", $row['outer_env']) ?></td>
-                    <td><?= str_repeat("★", $row['landlord_mgmt']) ?></td>
-                    <td><?= str_repeat("★", $row['room_condition']) ?></td>
-                    <td><?= str_repeat("★", $row['amenities']) ?></td>
-                    <td><?= str_repeat("★", $row['bachelor_friendly']) ?></td>
-                    <td><?= str_repeat("★", $row['location_access']) ?></td>
-                    <td><?= str_repeat("★", $row['value_money']) ?></td>
-                    <td><?= nl2br(htmlspecialchars($row['review_text'])) ?></td>
-                    <td><?= date("M d, Y", strtotime($row['created_at'])) ?></td>
-                </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
+    <?php if ($reviews->num_rows > 0): ?>
+        <?php while ($row = $reviews->fetch_assoc()): ?>
+            <div class="review">
+                <p><strong>Reviewer:</strong> <?= htmlspecialchars($row['username']) ?></p>
+                <p><strong>Outer Environment:</strong> <?= $row['outer_env'] ?>/5</p>
+                <p><strong>Landlord/Management:</strong> <?= $row['landlord_mgmt'] ?>/5</p>
+                <p><strong>Room/Flat Condition:</strong> <?= $row['room_condition'] ?>/5</p>
+                <p><strong>Amenities & Facilities:</strong> <?= $row['amenities'] ?>/5</p>
+                <p><strong>Bachelor-Friendliness:</strong> <?= $row['bachelor_friendly'] ?>/5</p>
+                <p><strong>Accessibility & Location:</strong> <?= $row['location_access'] ?>/5</p>
+                <p><strong>Value for Money:</strong> <?= $row['value_money'] ?>/5</p>
+                <p><strong>Review:</strong> <?= nl2br(htmlspecialchars($row['review_text'])) ?></p>
+                <p><em>Posted on <?= $row['created_at'] ?></em></p>
+            </div>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <p class="no-review">No reviews yet for this property.</p>
+    <?php endif; ?>
 </div>
-
 
 </body>
 </html>
