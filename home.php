@@ -108,6 +108,7 @@ $user_type = $row['user_type'];
             <button class="action-btn" onclick="window.location.href='view_vacancies.php'">View Vacancies</button>
             <button class="action-btn" onclick="window.location.href='maids_view.php'">View Maids</button>
             <button class="action-btn" onclick="window.location.href='meal_dashboard.php'">Meal Management</button>
+            <button class="action-btn" onclick="window.location.href='post_review.php'">Post Review</button>
         <?php elseif ($user_type === "Admin"): ?>
             <button class="action-btn" onclick="window.location.href='view_properties.php'">View Properties</button>
             <button class="action-btn" onclick="window.location.href='view_vacancies.php'">View Vacancies</button>
