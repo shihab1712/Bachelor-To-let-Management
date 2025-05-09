@@ -19,8 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $features = $_POST['features'];
     $status = $_POST['status'];
 
-    $stmt = $conn->prepare("INSERT INTO properties (owner_username, property_name, location, rent, rooms, features, status) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssdss", $username, $property_name, $location, $rent, $rooms, $features, $status);
+    $stmt = $conn->prepare("INSERT INTO properties (property_name, location, rent, rooms, features, status) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssisss", $property_name, $location, $rent, $rooms, $features, $status);
 
     if ($stmt->execute()) {
         $successMsg = "Property added successfully!";
