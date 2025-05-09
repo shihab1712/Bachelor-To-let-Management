@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
+$errorMsg = "";
 
 // Handle new person
 if (isset($_POST['add_person'])) {
@@ -17,7 +18,15 @@ if (isset($_POST['add_person'])) {
     if ($name) {
         $stmt = $conn->prepare("INSERT INTO persons (name, user_id) VALUES (?, ?)");
         $stmt->bind_param("si", $name, $user_id);
-        $stmt->execute();
+        try {
+            $stmt->execute();
+        } catch (mysqli_sql_exception $e) {
+            if ($e->getCode() == 1062) { // Duplicate entry error code
+                $errorMsg = "Cannot add the same name twice.";
+            } else {
+                $errorMsg = "Error: " . $e->getMessage();
+            }
+        }
     }
 }
 
@@ -225,6 +234,12 @@ $meal_rate = $total_meal > 0 ? $total_cost / $total_meal : 0;
         ← Back to Home
     </a>
     </div>
+
+    <?php if (!empty($errorMsg)): ?>
+        <div style="color: #d32f2f; background: #ffebee; padding: 10px 15px; border-radius: 6px; margin-bottom: 18px; text-align:center;">
+            <?= htmlspecialchars($errorMsg) ?>
+        </div>
+    <?php endif; ?>
 
     <h2>Meal Management Dashboard for <?php echo htmlspecialchars($username); ?></h2>
 

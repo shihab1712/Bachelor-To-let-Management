@@ -20,14 +20,15 @@ if (!$property) {
 
 // Handle update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $property_name = $_POST['property_name'];
     $location = $_POST['location'];
     $rent = $_POST['rent'];
     $rooms = $_POST['rooms'];
     $features = $_POST['features'];
     $status = $_POST['status'];
 
-    $update = $conn->prepare("UPDATE properties SET location=?, rent=?, rooms=?, features=?, status=? WHERE id=? AND owner_username=?");
-    $update->bind_param("sdsssis", $location, $rent, $rooms, $features, $status, $id, $username);
+    $update = $conn->prepare("UPDATE properties SET property_name=?, location=?, rent=?, rooms=?, features=?, status=? WHERE id=? AND owner_username=?");
+    $update->bind_param("ssdsssis",$property_name, $location, $rent, $rooms, $features, $status, $id, $username);
     
     if ($update->execute()) {
         $msg = "Updated successfully!";
@@ -120,6 +121,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Edit Property</h2>
 
     <form method="post">
+        <label>Property Name:</label>
+        <input type="text" name="property_name" value="<?= htmlspecialchars($property['property_name']) ?>" required>
+
         <label>Location:</label>
         <input type="text" name="location" value="<?= htmlspecialchars($property['location']) ?>" required>
 

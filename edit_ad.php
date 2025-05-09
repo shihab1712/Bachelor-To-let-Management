@@ -43,10 +43,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Edit Vacancy Ad</title>
-    <!-- Add your CSS here -->
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #80deea);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 450px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 0 16px rgba(0,0,0,0.10);
+            padding: 35px 30px 30px 30px;
+        }
+        .back-link {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+        .back-link a {
+            color: #00796b;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        h2 {
+            text-align: center;
+            color: #00796b;
+            margin-bottom: 25px;
+        }
+        form div {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #00796b;
+            font-weight: 500;
+        }
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #b2ebf2;
+            border-radius: 7px;
+            font-size: 15px;
+            background: #f1fafd;
+            transition: border 0.2s;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border: 1.5px solid #00796b;
+            outline: none;
+            background: #e0f7fa;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background: #00796b;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button[type="submit"]:hover {
+            background: #004d40;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
+    <div class="back-link">
+        <a href="posted_ad.php">&larr; Back to Posted Ads</a>
+    </div>
     <h2>Edit Vacancy Ad</h2>
     <form method="post">
         <div>

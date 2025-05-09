@@ -12,14 +12,15 @@ $successMsg = "";
 $errorMsg = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $property_name = $_POST['property_name'];
     $location = $_POST['location'];
     $rent = $_POST['rent'];
     $rooms = $_POST['rooms'];
     $features = $_POST['features'];
     $status = $_POST['status'];
 
-    $stmt = $conn->prepare("INSERT INTO properties (owner_username, location, rent, rooms, features, status) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssdss", $username, $location, $rent, $rooms, $features, $status);
+    $stmt = $conn->prepare("INSERT INTO properties (owner_username, property_name, location, rent, rooms, features, status) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssdss", $username, $property_name, $location, $rent, $rooms, $features, $status);
 
     if ($stmt->execute()) {
         $successMsg = "Property added successfully!";
@@ -113,6 +114,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="back-link"><a href="home.php">← Back to Home</a></div>
     <h2>Add Property</h2>
     <form method="post">
+        <label>Property Name</label>
+        <input type="text" name="property_name" required>
+
         <label>Location</label>
         <input type="text" name="location" required>
 

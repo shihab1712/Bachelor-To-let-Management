@@ -47,6 +47,12 @@ $where = ["status = 'Available'", "rooms > 0"];
 $params = [];
 $types = "";
 
+if (!empty($_GET['property_name'])) {
+    $where[] = "property_name LIKE ?";
+    $params[] = "%" . $_GET['property_name'] . "%";
+    $types .= "s";
+}
+
 if (!empty($_GET['location'])) {
     $where[] = "location LIKE ?";
     $params[] = "%" . $_GET['location'] . "%";
@@ -226,6 +232,7 @@ $properties = $result->fetch_all(MYSQLI_ASSOC);
     <div class="back-link"><a href="home.php">← Back to Home</a></div>
     <h2>Available Properties for Rent</h2>
     <form method="get" class="search-form">
+        <input type="text" name="property_name" placeholder="Property Name" value="<?= htmlspecialchars($_GET['property_name'] ?? '') ?>">
         <input type="text" name="location" placeholder="Location" value="<?= htmlspecialchars($_GET['location'] ?? '') ?>">
         <input type="number" name="min_rent" placeholder="Min Rent" value="<?= htmlspecialchars($_GET['min_rent'] ?? '') ?>">
         <input type="number" name="max_rent" placeholder="Max Rent" value="<?= htmlspecialchars($_GET['max_rent'] ?? '') ?>">
@@ -236,6 +243,7 @@ $properties = $result->fetch_all(MYSQLI_ASSOC);
         <table>
             <thead>
                 <tr>
+                    <th>Property Name</th>
                     <th>Location</th>
                     <th>Monthly Rent</th>
                     <th>Rooms</th>
@@ -248,6 +256,7 @@ $properties = $result->fetch_all(MYSQLI_ASSOC);
             <tbody>
                 <?php foreach ($properties as $property): ?>
                     <tr>
+                        <td><?= htmlspecialchars($property['property_name']); ?></td>
                         <td><?= htmlspecialchars($property['location']); ?></td>
                         <td><?= htmlspecialchars($property['rent']); ?></td>
                         <td><?= htmlspecialchars($property['rooms']); ?></td>

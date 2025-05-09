@@ -104,7 +104,7 @@ $reviews = $review_stmt->get_result();
 <body>
 
 <div class="container">
-    <div class="back-link"><a href="properties_ad.php">← Back to Browse Properties</a></div>
+    <div class="back-link"><a href="view_properties.php">← Back to Browse Properties</a></div>
     <h2>Reviews for Property in <?= htmlspecialchars($property['location']) ?></h2>
 
     <div class="property-info">

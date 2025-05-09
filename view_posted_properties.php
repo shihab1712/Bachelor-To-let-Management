@@ -106,6 +106,7 @@ $properties = $result->fetch_all(MYSQLI_ASSOC);
         <table>
             <thead>
                 <tr>
+                    <th>Property Name</th>
                     <th>Location</th>
                     <th>Monthly Rent</th>
                     <th>Rooms</th>
@@ -118,6 +119,7 @@ $properties = $result->fetch_all(MYSQLI_ASSOC);
             <tbody>
                 <?php foreach ($properties as $prop): ?>
                     <tr>
+                        <td><?= htmlspecialchars($prop['property_name']); ?></td>
                         <td><?= htmlspecialchars($prop['location']); ?></td>
                         <td><?= htmlspecialchars($prop['rent']); ?></td>
                         <td><?= htmlspecialchars($prop['rooms']); ?></td>
