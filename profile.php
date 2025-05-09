@@ -161,6 +161,40 @@ if (isset($_POST['delete'])) {
         <button type="submit" name="delete" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete your account? This action is irreversible.');">Delete Account</button>
     </form>
 
+    <!-- Change Password Button -->
+    <button onclick="document.getElementById('changePassModal').style.display='block'" style="margin-top:20px;">
+      Change Password
+    </button>
+
+    <!-- Change Password Modal/Form -->
+    <div id="changePassModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+      <div style="background:#fff; color:#222; padding:30px; border-radius:10px; max-width:350px; margin:auto; position:relative;">
+        <span onclick="document.getElementById('changePassModal').style.display='none'" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;">&times;</span>
+        <h3 style="margin-bottom:15px;">Change Password</h3>
+        <form action="change_password.php" method="POST">
+          <input type="password" name="current_password" placeholder="Current Password" required style="width:100%; margin-bottom:10px; padding:8px;">
+          <input type="password" name="new_password" placeholder="New Password" required style="width:100%; margin-bottom:10px; padding:8px;">
+          <input type="password" name="confirm_password" placeholder="Confirm New Password" required style="width:100%; margin-bottom:15px; padding:8px;">
+          <button type="submit" style="width:100%;">Update Password</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Optional: Close modal when clicking outside the modal box
+      window.onclick = function(event) {
+        var modal = document.getElementById('changePassModal');
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    </script>
+
+    <?php if (isset($_GET['passmsg'])): ?>
+        <p class="message <?php echo isset($_GET['passerr']) ? 'error' : ''; ?>">
+        <?php echo htmlspecialchars($_GET['passmsg']); ?></p>
+    <?php endif; ?>
+
     <?php if ($updateMsg): ?>
         <p class="message"><?php echo $updateMsg; ?></p>
     <?php endif; ?>

@@ -2,11 +2,6 @@
 session_start();
 require 'db.php';
 
-// Uncomment for production
-// if (!isset($_SESSION['username']) || $_SESSION['user_type'] !== 'Owner') {
-//     header("Location: index.html");
-//     exit();
-// }
 
 $id = $_GET['id'];
 $username = $_SESSION['username'];

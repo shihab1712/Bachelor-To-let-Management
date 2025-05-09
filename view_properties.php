@@ -9,8 +9,41 @@ if (!isset($_SESSION['username'])) {
 
 $username = $_SESSION['username'];
 
+// Check if user has active rental
+$activeRental = $conn->prepare("
+    SELECT * FROM rental_requests 
+    WHERE bachelor_username = ? 
+    AND status = 'Approved'
+");
+$activeRental->bind_param("s", $username);
+$activeRental->execute();
+$hasActiveRental = $activeRental->get_result()->num_rows > 0;
+
+if ($hasActiveRental) {
+    header("Location: manage_rental.php");
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Get any pending requests for this bachelor
+$pendingRequests = [];
+if (isset($_SESSION['username'])) {
+    $requestCheck = $conn->prepare("
+        SELECT property_id 
+        FROM rental_requests 
+        WHERE bachelor_username = ? AND status IN ('Pending', 'Approved')
+    ");
+    $requestCheck->bind_param("s", $username);
+    $requestCheck->execute();
+    $result = $requestCheck->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $pendingRequests[] = $row['property_id'];
+    }
+}
+
 // Build search filters
-$where = ["status = 'Available'"];
+$where = ["status = 'Available'", "rooms > 0"];
 $params = [];
 $types = "";
 
@@ -120,17 +153,76 @@ $properties = $result->fetch_all(MYSQLI_ASSOC);
             background-color: #01579b;
         }
         .action-btn {
-            padding: 8px 15px;
-            background-color: #0288d1;
-            color: white;
+            display: inline-block;
+            padding: 8px 16px;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
             cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+        .rent-btn {
+            background-color: #00796b;
+            color: white;
+        }
+        .review-btn {
+            background-color: #00796b;
+            color: white;
+        }
+        .rent-btn:hover, .review-btn:hover {
+            background-color: #004d40;
+        }
+        .fully-occupied {
+            color: red;
+            font-weight: bold;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .alert.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .alert.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        .pending-request {
+            color: #f57c00;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 <div class="container">
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert success">
+            <?php 
+                echo $_SESSION['success'];
+                unset($_SESSION['success']);
+            ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert error">
+            <?php 
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+            ?>
+        </div>
+    <?php endif; ?>
+
     <div class="back-link"><a href="home.php">← Back to Home</a></div>
     <h2>Available Properties for Rent</h2>
     <form method="get" class="search-form">
@@ -162,13 +254,24 @@ $properties = $result->fetch_all(MYSQLI_ASSOC);
                         <td><?= htmlspecialchars($property['features']); ?></td>
                         <td><?= htmlspecialchars($property['status']); ?></td>
                         <td>
-                            <form method="post" action="rent_now.php" style="display:inline;">
-                                <input type="hidden" name="property_id" value="<?= htmlspecialchars($property['id']); ?>">
-                                <button type="submit" class="btn-rent">Rent Now!</button>
-                            </form>
+                            <?php if ($property['rooms'] > 0): ?>
+                                <?php if (!in_array($property['id'], $pendingRequests)): ?>
+                                    <form method="post" action="rent_now.php" style="display:inline;">
+                                        <input type="hidden" name="property_id" value="<?= htmlspecialchars($property['id']); ?>">
+                                        <button type="submit" class="action-btn rent-btn">Rent Now</button>
+                                    </form>
+                                <?php else: ?>
+                                    <span class="pending-request">Request Pending</span>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <span class="fully-occupied">Fully Occupied</span>
+                            <?php endif; ?>
                         </td>
                         <td>
-                            <a href="property_reviews.php?property_id=<?= $property['id'] ?>" class="btn-review">Property Review</a>
+                            <a href="property_reviews.php?property_id=<?= $property['id'] ?>" 
+                               class="action-btn review-btn">
+                                Property Reviews
+                            </a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

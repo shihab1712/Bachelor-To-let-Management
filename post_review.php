@@ -95,8 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
 <div class="container">
-    <div class="back-btn">
-        <a href="home.php">← Back to Home</a>
+    <div style="text-align: right; margin-bottom: 20px;">
+    <a href="home.php" style="
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+    ">
+        ← Back to Home
+    </a>
     </div>
     <h2>Post Property Review</h2>
     <?php if (isset($msg)) echo "<p class='message'>$msg</p>"; ?>

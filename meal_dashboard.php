@@ -2,10 +2,11 @@
 session_start();
 require 'db.php';
 
-// if (!isset($_SESSION['username'], $_SESSION['user_id'])) {
-//     header("Location: index.html");
-//     exit();
-// }
+if (!isset($_SESSION['user_id'])) {
+    // Not logged in or session expired
+    header("Location: index.html");
+    exit();
+}
 
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
@@ -212,8 +213,17 @@ $meal_rate = $total_meal > 0 ? $total_cost / $total_meal : 0;
     
 
 <div class="container">
-    <div class="top-right">
-        <a href="home.php" class="btn">← Back to Home</a>
+    <div style="text-align: right; margin-bottom: 20px;">
+    <a href="home.php" style="
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+    ">
+        ← Back to Home
+    </a>
     </div>
 
     <h2>Meal Management Dashboard for <?php echo htmlspecialchars($username); ?></h2>

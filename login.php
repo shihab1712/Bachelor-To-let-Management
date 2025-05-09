@@ -5,24 +5,29 @@ session_start();
 $username = $_POST['username'];
 $password = $_POST['password']; // ✅ This was missing earlier
 
-// Query to get user info by username
-$sql = "SELECT * FROM users WHERE username = ?";
+// Fetch hashed password and user_type from DB
+$sql = "SELECT id, password, user_type FROM users WHERE username = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
-
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-if ($user && $user['password'] === $password) {
-    $_SESSION['user_type'] = $user['user_type'];
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['username'] = $username;
-    header("Location: home.php");
-
-    exit();
+$stmt->bind_result($user_id, $hashed_password, $user_type);
+if ($stmt->fetch()) {
+    if (password_verify($password, $hashed_password)) {
+        // Password correct, log in user
+        $_SESSION['user_id'] = $user_id; // <-- Add this line
+        $_SESSION['username'] = $username;
+        $_SESSION['user_type'] = $user_type; // <-- Save user_type in session
+        header("Location: home.php");
+        exit();
+    } else {
+        // Wrong password
+        header("Location: index.html?error=invalid");
+        exit();
+    }
 } else {
-    echo "<script>alert('Invalid credentials!'); window.location.href='index.html';</script>";
+    // Username not found
+    header("Location: index.html?error=invalid");
+    exit();
 }
 
 $stmt->close();
